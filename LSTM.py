@@ -126,17 +126,21 @@ history = model.fit(train_dataset,
 model = keras.models.load_model("jena_dense.keras") # Load saved model
 print(f"Test MAE: {model.evaluate(val_dataset)[0]:.2f}") # test the performance of the model
 
-for inputs, targets in val_dataset:
-    prediction = model.predict(inputs[:1])
-    print(prediction * std + mean)
+prediction = np.zeros(len(val_dataset))
+target = np.zeros(len(val_dataset))
+iter = 0
 
-loss = history.history["mae"]
-val_loss = history.history["val_mae"]
-epochs = range(1, len(loss) + 1)
+for inputs, targets in val_dataset:
+    predict_value = model.predict(inputs[:1])
+    prediction[iter] = predict_value * std + mean # This is prediction part
+    target[iter] = targets * std + mean
+    iter += 1
+    
+coordinate = range(1, len(val_dataset) + 1)
 plt.figure()
-plt.plot(epochs, loss, "bo", label="Training MAE")
-plt.plot(epochs, val_loss, "b", label="Validation MAE")
-plt.title("Training and validation MAE")
+plt.plot(coordinate, prediction, "bo", label="Prediction Sales")
+plt.plot(coordinate, target, "b", label="Real Sales")
+plt.title("Prediction and Real Sales")
 plt.legend()
 plt.show()
 ##############################################################
